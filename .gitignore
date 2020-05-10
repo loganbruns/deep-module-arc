@@ -127,3 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Dataset
+data/
+
+# Experiments
+experiment/
+
+# Ignore emacs backup files
+*~
+
+# Ignore nohup.out files
+nohup.out
