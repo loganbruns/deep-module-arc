@@ -24,7 +24,7 @@ _experiments/_ directory to hold experiment checkpoints and tensorboard logs
 ### Environment preparation steps
 
 ```
-$ conda create --name deep-module-arc --file environment.yml
+$ conda env create --name deep-module-arc --file environment.yml
 $ conda activate deep-module-arc
 ```
 

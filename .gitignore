@@ -139,3 +139,6 @@ experiment/
 
 # Ignore nohup.out files
 nohup.out
+
+# Ignore pretrained file
+arc_pretrained.zip
