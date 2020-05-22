@@ -34,7 +34,7 @@ class ArcModel(Model):
         self.test_loss = tf.keras.metrics.Mean(name='test_loss')
 
     @tf.function
-    def call(self, train_examples, test_input, test_output):
+    def call(self, train_length, train_examples, test_input, test_output):
         train_examples = tf.reshape(train_examples, [train_examples.shape[0]] + [-1] + list(train_examples.shape[-3:]))
         test_input = tf.reshape(test_input, [test_input.shape[0]] + [-1] + list(test_input.shape[-3:]))
 
@@ -58,7 +58,7 @@ class ArcModel(Model):
         embeddings = tf.stack(embeddings, axis=1)
         embeddings_shape = list(embeddings.shape)
         embeddings = tf.reshape(embeddings, embeddings_shape[:2] + [-1])
-        
+
         x = self.lstm(embeddings)
 
         x = tf.reshape(x, [-1] + embeddings_shape[2:])
@@ -72,9 +72,9 @@ class ArcModel(Model):
         return x
 
     @tf.function
-    def train_step(self, train_examples, test_input, test_output):
+    def train_step(self, train_length, train_examples, test_input, test_output):
         with tf.GradientTape() as tape:
-            predictions = self(train_examples, test_input, test_output)
+            predictions = self(train_length, train_examples, test_input, test_output)
             test_output = tf.squeeze(tf.cast(tf.reduce_sum(test_output, axis=-1), dtype=tf.int32))
             loss = self.loss_object(test_output, predictions)
             gradients = tape.gradient(loss, self.trainable_variables)
@@ -83,8 +83,8 @@ class ArcModel(Model):
             return predictions
 
     @tf.function
-    def test_step(self, train_examples, test_input, test_output):
-        predictions = self(train_examples, test_input, test_output)
+    def test_step(self, train_length, train_examples, test_input, test_output):
+        predictions = self(train_length, train_examples, test_input, test_output)
         test_output = tf.squeeze(tf.cast(tf.reduce_sum(test_output, axis=-1), dtype=tf.int32))
         t_loss = self.loss_object(test_output, predictions)
         self.test_loss(t_loss)

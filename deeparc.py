@@ -19,7 +19,7 @@ flags.DEFINE_string('experiment_name', None, 'Name of experiment to train and ru
 
 flags.DEFINE_string('gpu', '0', 'GPU to use')
 
-flags.DEFINE_integer('batch_size', 1, 'Batch size')
+flags.DEFINE_integer('batch_size', 32, 'Batch size')
 
 def main(unparsed_argv):
     """start main training loop"""
@@ -56,7 +56,7 @@ def main(unparsed_argv):
     train = train.cache()
     val = val.cache()
 
-    train = train.repeat().shuffle(50).batch(FLAGS.batch_size).prefetch(4)
+    train = train.repeat().shuffle(400).batch(FLAGS.batch_size).prefetch(4)
     val = val.batch(FLAGS.batch_size).prefetch(1)
     test = test.batch(FLAGS.batch_size)
 
@@ -66,13 +66,13 @@ def main(unparsed_argv):
     startstep = int(ckpt.step)
         
     once_per_epoch = False
-    for id, train_examples, test_input, test_output in train:
+    for id, train_length, train_examples, test_input, test_output in train:
         if test_output.shape[1] > 1:
             print(f'WARNING: skipping multiple test predictions: {test_output.shape}')
             continue
 
         with train_summary_writer.as_default():
-            predictions = model.train_step(train_examples, test_input, test_output)
+            predictions = model.train_step(train_length, train_examples, test_input, test_output)
             ckpt.step.assign_add(1)
 
             if not once_per_train:
@@ -90,8 +90,11 @@ def main(unparsed_argv):
 
         if int(ckpt.step) % 500 == 0:
             with test_summary_writer.as_default():
-                for id, train_examples, test_input, test_output in val:
-                    test_predictions = model.test_step(train_examples, test_input, test_output)
+                for id, train_length, train_examples, test_input, test_output in val:
+                    if test_output.shape[1] > 1:
+                        print(f'WARNING: skipping multiple test predictions: {test_output.shape}')
+                        continue
+                    test_predictions = model.test_step(train_length, train_examples, test_input, test_output)
 
                 print(f"{int(ckpt.step)}: test loss={model.test_loss.result()}")
                 tf.summary.scalar('loss', model.test_loss.result(), step=int(ckpt.step))
