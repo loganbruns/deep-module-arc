@@ -132,7 +132,7 @@ dmypy.json
 data/
 
 # Experiments
-experiment/
+experiments/
 
 # Ignore emacs backup files
 *~
@@ -142,3 +142,4 @@ nohup.out
 
 # Ignore pretrained file
 arc_pretrained.zip
+
