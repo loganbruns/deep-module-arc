@@ -59,3 +59,29 @@ def random_roll_dataset(dataset):
         num_parallel_calls=multiprocessing.cpu_count()
     )
 
+
+def _random_remap_example(id, train_length, train_examples, test_input, test_output):
+    """ Randomly remap most colors on all images. (Except 0 and 1 to not interfere with mask) """
+
+    table = tf.lookup.experimental.DenseHashTable(key_dtype=tf.int32,
+                                 value_dtype=tf.int32,
+                                 default_value=-1,
+                                 empty_key=-2,
+                                 deleted_key=-1)
+    table.erase(tf.range(1))
+    table.insert(tf.range(2, 10), tf.random.shuffle(tf.range(2, 10)))
+    table.insert(tf.range(2), tf.range(2))
+
+    train_example = tf.reshape(table.lookup(tf.reshape(train_examples, [-1])), tf.shape(train_examples))
+    test_input = tf.reshape(table.lookup(tf.reshape(test_input, [-1])), tf.shape(test_input))
+    test_output = tf.reshape(table.lookup(tf.reshape(test_output, [-1])), tf.shape(test_output))
+
+    return id, train_length, train_examples, test_input, test_output
+
+
+def random_remap_dataset(dataset):
+    """ Randomly remap most colors in dataset """
+
+    return dataset.map(
+        lambda id, train_length, train_examples, test_input, test_output: _random_remap_example(id, train_length, train_examples, test_input, test_output)
+    )

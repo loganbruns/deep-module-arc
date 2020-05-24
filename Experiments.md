@@ -1,3 +1,7 @@
+# v1_2: Add random remap colors data augmentation
+
+- Add random remap colors to all images
+
 # v1_1: Add random roll data augmentation
 
 - Add random roll to all images

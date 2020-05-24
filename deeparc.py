@@ -8,7 +8,7 @@ import tensorflow as tf
 
 from arc import ArcDataset
 from arc_model import ArcModel
-from data_transforms import random_roll_dataset
+from data_transforms import random_roll_dataset, random_remap_dataset
 
 from absl import app
 from absl import flags
@@ -55,7 +55,9 @@ def main(unparsed_argv):
     train, val, _ = ArcDataset('data')
 
     train = random_roll_dataset(train.cache())
+    train = random_remap_dataset(train)
     val = random_roll_dataset(val.cache())
+    val = random_remap_dataset(val)
 
     train = train.repeat().shuffle(400).batch(FLAGS.batch_size).prefetch(4)
     val = val.batch(FLAGS.batch_size).prefetch(1)
