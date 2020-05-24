@@ -9,3 +9,6 @@
 - Use fully convolutional network with LSTM in middle
 - Overfits training set and loss of validation increases
 
+| Loss | Accuracy | IoU |
+|---------|-------------|-------|
+| <img src="images/v1_0_loss.png" alt="Loss" width="320"> | <img src="images/v1_0_acc.png" alt="Accuracy" width="320"> | <img src="images/v1_0_iou.png" alt="IoU" width="320"> |
