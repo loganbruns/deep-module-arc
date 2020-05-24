@@ -3,7 +3,7 @@
 import tensorflow as tf
 import json
 
-def ArcDataset(dir_name, pad_length=30, sequence_length=10):
+def ArcDataset(dir_name, pad_length=32, sequence_length=10):
     """ Create a dataset to read ARC dataset """
 
     def _pad_example(example, pad_length):

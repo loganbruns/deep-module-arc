@@ -13,16 +13,16 @@ class ArcModel(Model):
 
         # Layers
         self.conv1 = Conv2D(24, 3, 2, padding='same', activation='relu')
-        self.conv2 = Conv2D(96, 3, 3, padding='same', activation='relu')
-        self.conv3 = Conv2D(48, 3, 1, padding='same', activation='relu')
-        self.conv4 = Conv2D(24, 3, 1, padding='same', activation='relu')
-        self.conv5 = Conv2D(12, 3, 1, padding='same', activation='relu')
+        self.conv2 = Conv2D(48, 3, 2, padding='same', activation='relu')
+        self.conv3 = Conv2D(96, 3, 2, padding='same', activation='relu')
+        self.conv4 = Conv2D(192, 3, 2, padding='same', activation='relu')
+        self.conv5 = Conv2D(384, 3, 2, padding='same', activation='relu')
         self.layernorm1 = LayerNormalization()
-        self.lstm = LSTM(300)
-        self.deconv1 = Conv2DTranspose(12, 3, 1, padding='same', activation='relu')
-        self.deconv2 = Conv2DTranspose(24, 3, 1, padding='same', activation='relu')
-        self.deconv3 = Conv2DTranspose(48, 3, 1, padding='same', activation='relu')
-        self.deconv4 = Conv2DTranspose(96, 3, 3, padding='same', activation='relu')
+        self.lstm = LSTM(384)
+        self.deconv1 = Conv2DTranspose(384, 3, 2, padding='same', activation='relu')
+        self.deconv2 = Conv2DTranspose(192, 3, 2, padding='same', activation='relu')
+        self.deconv3 = Conv2DTranspose(96, 3, 2, padding='same', activation='relu')
+        self.deconv4 = Conv2DTranspose(48, 3, 2, padding='same', activation='relu')
         self.deconv5 = Conv2DTranspose(24, 3, 2, padding='same', activation='relu')
         self.layernorm2 = LayerNormalization()
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
@@ -31,7 +31,11 @@ class ArcModel(Model):
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
         self.optimizer = tf.keras.optimizers.Adam()
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
+        self.train_acc = tf.keras.metrics.SparseCategoricalAccuracy(name='train_acc')
+        self.train_iou = tf.keras.metrics.MeanIoU(11, name='train_iou')
         self.test_loss = tf.keras.metrics.Mean(name='test_loss')
+        self.test_acc = tf.keras.metrics.SparseCategoricalAccuracy(name='test_acc')
+        self.test_iou = tf.keras.metrics.MeanIoU(11, name='test_iou')
 
     @tf.function
     def call(self, train_length, train_examples, test_input, test_output):
@@ -46,7 +50,7 @@ class ArcModel(Model):
                 # Add mask to categories and one hot encode
                 x = tf.cast(tf.reduce_sum(x, axis=-1), dtype=tf.int32)
                 x = tf.one_hot(x, 11)
-            
+
                 x = self.conv1(x)
                 x = self.conv2(x)
                 x = self.conv3(x)
@@ -80,6 +84,8 @@ class ArcModel(Model):
             gradients = tape.gradient(loss, self.trainable_variables)
             self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
             self.train_loss(loss)
+            self.train_acc.update_state(test_output, predictions)
+            self.train_iou.update_state(test_output, tf.argmax(predictions, axis=-1))
             return predictions
 
     @tf.function
@@ -88,6 +94,8 @@ class ArcModel(Model):
         test_output = tf.squeeze(tf.cast(tf.reduce_sum(test_output, axis=-1), dtype=tf.int32))
         t_loss = self.loss_object(test_output, predictions)
         self.test_loss(t_loss)
+        self.test_acc.update_state(test_output, predictions)
+        self.test_iou.update_state(test_output, tf.argmax(predictions, axis=-1))
         return predictions
 
 

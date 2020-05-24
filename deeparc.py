@@ -8,6 +8,7 @@ import tensorflow as tf
 
 from arc import ArcDataset
 from arc_model import ArcModel
+from data_transforms import random_roll_dataset
 
 from absl import app
 from absl import flags
@@ -51,14 +52,13 @@ def main(unparsed_argv):
     test_summary_writer = tf.summary.create_file_writer(test_log_dir)        
 
     # Load NYUv2 depth dataset
-    train, val, test = ArcDataset('data')
+    train, val, _ = ArcDataset('data')
 
-    train = train.cache()
-    val = val.cache()
+    train = random_roll_dataset(train.cache())
+    val = random_roll_dataset(val.cache())
 
     train = train.repeat().shuffle(400).batch(FLAGS.batch_size).prefetch(4)
     val = val.batch(FLAGS.batch_size).prefetch(1)
-    test = test.batch(FLAGS.batch_size)
 
     # Start training loop
     once_per_train = False
@@ -80,13 +80,15 @@ def main(unparsed_argv):
                 once_per_train = True
 
             tf.summary.scalar('loss', model.train_loss.result(), step=int(ckpt.step))
+            tf.summary.scalar('accuracy', model.train_acc.result(), step=int(ckpt.step))
+            tf.summary.scalar('iou', model.train_iou.result(), step=int(ckpt.step))
 
             train_summary_writer.flush()
                 
         if int(ckpt.step) % 100 == 0:
             save_path = manager.save()
             print("Saved checkpoint for step {}: {}".format(int(ckpt.step), save_path))
-            print("Training loss {:1.2f}".format(model.train_loss.result()))
+            print("Training loss {:1.2f}, accuracy {:1.2f}, IoU {:1.2f}".format(model.train_loss.result(), model.train_acc.result(), model.train_iou.result()))
 
         if int(ckpt.step) % 500 == 0:
             with test_summary_writer.as_default():
@@ -96,8 +98,10 @@ def main(unparsed_argv):
                         continue
                     test_predictions = model.test_step(train_length, train_examples, test_input, test_output)
 
-                print(f"{int(ckpt.step)}: test loss={model.test_loss.result()}")
+                print(f"{int(ckpt.step)}: test loss={model.test_loss.result()}, test accuracy={model.test_acc.result()}, test iou={model.test_iou.result()}")
                 tf.summary.scalar('loss', model.test_loss.result(), step=int(ckpt.step))
+                tf.summary.scalar('accuracy', model.test_acc.result(), step=int(ckpt.step))
+                tf.summary.scalar('iou', model.test_iou.result(), step=int(ckpt.step))
 
                 test_summary_writer.flush()
                 

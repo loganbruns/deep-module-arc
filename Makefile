@@ -1,4 +1,4 @@
-EXPERIMENT=baseline
+EXPERIMENT=v1_1
 
 train:
 	python deeparc.py --experiment_name=$(EXPERIMENT) --gpu=0
@@ -8,3 +8,6 @@ notebook:
 
 pretrained:
 	zip -o arc_pretrained.zip *.py
+
+tensorboard:
+	nohup tensorboard --host 0.0.0.0 --logdir ./experiments/$(EXPERIMENT) --samples_per_plugin images=10000 &
