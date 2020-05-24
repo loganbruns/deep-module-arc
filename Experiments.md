@@ -3,6 +3,7 @@
 - Add random roll to all images
 - Bump padding size from 30 to 32
 - Update model to support new 32x32 size
+- Test loss reduced, training appears harder / less memorization, hard to tell with other metrics since they count over the whole 32x32 grid, I think it is an improvement.
 
 | Loss | Accuracy | IoU |
 |---------|-------------|-------|
