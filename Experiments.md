@@ -4,6 +4,10 @@
 - Bump padding size from 30 to 32
 - Update model to support new 32x32 size
 
+| Loss | Accuracy | IoU |
+|---------|-------------|-------|
+| <img src="images/v1_1_loss.png" alt="Loss" width="320"> | <img src="images/v1_1_acc.png" alt="Accuracy" width="320"> | <img src="images/v1_1_iou.png" alt="IoU" width="320"> |
+
 # v1_0: Baseline
 
 - Use fully convolutional network with LSTM in middle
