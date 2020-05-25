@@ -8,7 +8,7 @@ import tensorflow as tf
 
 from arc import ArcDataset
 from arc_model import ArcModel
-from data_transforms import random_roll_dataset, random_remap_dataset, random_flip_dataset
+from data_transforms import random_roll_dataset, random_remap_dataset, random_flip_dataset, random_rotate_dataset
 
 from absl import app
 from absl import flags
@@ -57,9 +57,11 @@ def main(unparsed_argv):
     train = random_roll_dataset(train.cache())
     train = random_remap_dataset(train)
     train = random_flip_dataset(train)
+    train = random_rotate_dataset(train)
     val = random_roll_dataset(val.cache())
     val = random_remap_dataset(val)
     val = random_flip_dataset(val)
+    val = random_rotate_dataset(val)
 
     train = train.repeat().shuffle(400).batch(FLAGS.batch_size).prefetch(4)
     val = val.batch(FLAGS.batch_size).prefetch(1)

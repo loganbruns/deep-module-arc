@@ -113,3 +113,23 @@ def random_flip_dataset(dataset):
     )
 
 
+def _random_rotate_example(id, train_length, train_examples, test_input, test_output):
+    """ Randomly rotate all images """
+
+    num_rotations = tf.random.uniform(maxval=3, dtype=tf.int32, shape=[])
+    train_examples = tf.reshape(tf.image.rot90(tf.reshape(train_examples, [-1, 32, 32, 2]), num_rotations), tf.shape(train_examples))
+    test_input = tf.reshape(tf.image.rot90(tf.reshape(test_input, [-1, 32, 32, 2]), num_rotations), tf.shape(test_input))
+    test_output = tf.reshape(tf.image.rot90(tf.reshape(test_output, [-1, 32, 32, 2]), num_rotations), tf.shape(test_output))
+    
+    return id, train_length, train_examples, test_input, test_output
+
+
+def random_rotate_dataset(dataset):
+    """ Randomly flip dataset """
+
+    return dataset.map(
+        lambda id, train_length, train_examples, test_input, test_output: _random_rotate_example(id, train_length, train_examples, test_input, test_output),
+        num_parallel_calls=multiprocessing.cpu_count()
+    )
+
+

@@ -1,6 +1,11 @@
+# v1_4: Add random rotation data augmentation
+
+- Add random rotation to all images
+
 # v1_3: Add random flip data augmentation
 
 - Add random left to right flip to all images
+- Improved across all metrics but peaks at around 14k. 
 
 | Loss | Accuracy | IoU |
 |---------|-------------|-------|

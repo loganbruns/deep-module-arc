@@ -1,4 +1,4 @@
-EXPERIMENT=v1_3
+EXPERIMENT=v1_4
 
 train:
 	python deeparc.py --experiment_name=$(EXPERIMENT) --gpu=0
