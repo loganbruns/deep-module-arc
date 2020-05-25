@@ -85,3 +85,31 @@ def random_remap_dataset(dataset):
     return dataset.map(
         lambda id, train_length, train_examples, test_input, test_output: _random_remap_example(id, train_length, train_examples, test_input, test_output)
     )
+
+
+def _random_flip_example(id, train_length, train_examples, test_input, test_output):
+    """ Randomly flip all images """
+
+    flip_left_right = tf.equal(tf.random.uniform(maxval=2, dtype=tf.int32, shape=[]), 0)
+    tf.cond(flip_left_right,
+            lambda: tf.reshape(tf.image.flip_left_right(tf.reshape(train_examples, [-1, 32, 32, 2])), tf.shape(train_examples)),
+            lambda: train_examples)
+    tf.cond(flip_left_right,
+            lambda: tf.reshape(tf.image.flip_left_right(tf.reshape(test_input, [-1, 32, 32, 2])), tf.shape(test_input)),
+            lambda: test_input)
+    tf.cond(flip_left_right,
+            lambda: tf.reshape(tf.image.flip_left_right(tf.reshape(test_output, [-1, 32, 32, 2])), tf.shape(test_output)),
+            lambda: test_output)
+    
+    return id, train_length, train_examples, test_input, test_output
+
+
+def random_flip_dataset(dataset):
+    """ Randomly flip dataset """
+
+    return dataset.map(
+        lambda id, train_length, train_examples, test_input, test_output: _random_flip_example(id, train_length, train_examples, test_input, test_output),
+        num_parallel_calls=multiprocessing.cpu_count()
+    )
+
+

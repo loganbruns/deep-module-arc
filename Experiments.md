@@ -1,6 +1,15 @@
+# v1_3: Add random flip data augmentation
+
+- Add random left to right flip to all images
+
 # v1_2: Add random remap colors data augmentation
 
 - Add random remap colors to all images
+- Test lost improves until around 35k. Then it starts to memorize again. An improvement.
+
+| Loss | Accuracy | IoU |
+|---------|-------------|-------|
+| <img src="images/v1_2_loss.png" alt="Loss" width="320"> | <img src="images/v1_2_acc.png" alt="Accuracy" width="320"> | <img src="images/v1_2_iou.png" alt="IoU" width="320"> |
 
 # v1_1: Add random roll data augmentation
 
