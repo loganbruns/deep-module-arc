@@ -91,13 +91,13 @@ def _random_flip_example(id, train_length, train_examples, test_input, test_outp
     """ Randomly flip all images """
 
     flip_left_right = tf.equal(tf.random.uniform(maxval=2, dtype=tf.int32, shape=[]), 0)
-    tf.cond(flip_left_right,
+    train_examples = tf.cond(flip_left_right,
             lambda: tf.reshape(tf.image.flip_left_right(tf.reshape(train_examples, [-1, 32, 32, 2])), tf.shape(train_examples)),
             lambda: train_examples)
-    tf.cond(flip_left_right,
+    test_input = tf.cond(flip_left_right,
             lambda: tf.reshape(tf.image.flip_left_right(tf.reshape(test_input, [-1, 32, 32, 2])), tf.shape(test_input)),
             lambda: test_input)
-    tf.cond(flip_left_right,
+    test_output = tf.cond(flip_left_right,
             lambda: tf.reshape(tf.image.flip_left_right(tf.reshape(test_output, [-1, 32, 32, 2])), tf.shape(test_output)),
             lambda: test_output)
     

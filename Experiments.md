@@ -2,6 +2,10 @@
 
 - Add random left to right flip to all images
 
+| Loss | Accuracy | IoU |
+|---------|-------------|-------|
+| <img src="images/v1_3_loss.png" alt="Loss" width="320"> | <img src="images/v1_3_acc.png" alt="Accuracy" width="320"> | <img src="images/v1_3_iou.png" alt="IoU" width="320"> |
+
 # v1_2: Add random remap colors data augmentation
 
 - Add random remap colors to all images
