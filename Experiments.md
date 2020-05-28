@@ -1,6 +1,7 @@
 # v1_4: Add random rotation data augmentation
 
 - Add random rotation to all images
+- Improved across all metrics but peaks at around 70k
 
 # v1_3: Add random flip data augmentation
 
