@@ -13,18 +13,11 @@ class ArcModel(Model):
         super(ArcModel, self).__init__()
 
         # Layers
-        self.conv1 = Conv2D(24, 3, 2, padding='same', activation='relu')
-        self.conv2 = Conv2D(48, 3, 2, padding='same', activation='relu')
-        self.conv3 = Conv2D(96, 3, 2, padding='same', activation='relu')
-        self.conv4 = Conv2D(192, 3, 2, padding='same', activation='relu')
-        self.conv5 = Conv2D(384, 3, 2, padding='same', activation='relu')
+        conv_channels = [24, 48, 96, 192, 384]
+        self.conv_layers = [Conv2D(channel, 3, 2, padding='same', activation='relu') for channel in conv_channels]
         self.layernorm1 = LayerNormalization()
         self.lstm = LSTM(384)
-        self.deconv1 = Conv2DTranspose(384, 3, 2, padding='same', activation='relu')
-        self.deconv2 = Conv2DTranspose(192, 3, 2, padding='same', activation='relu')
-        self.deconv3 = Conv2DTranspose(96, 3, 2, padding='same', activation='relu')
-        self.deconv4 = Conv2DTranspose(48, 3, 2, padding='same', activation='relu')
-        self.deconv5 = Conv2DTranspose(24, 3, 2, padding='same', activation='relu')
+        self.conv_transpose_layers = [Conv2DTranspose(channel, 3, 2, padding='same', activation='relu') for channel in reversed(conv_channels)]
         self.layernorm2 = LayerNormalization()
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
 
@@ -53,11 +46,8 @@ class ArcModel(Model):
                 x = tf.cast(tf.reduce_sum(x, axis=-1), dtype=tf.int32)
                 x = tf.one_hot(x, 11)
 
-                x = self.conv1(x)
-                x = self.conv2(x)
-                x = self.conv3(x)
-                x = self.conv4(x)
-                x = self.conv5(x)
+                for conv in self.conv_layers:
+                    x = conv(x)
                 x = self.layernorm1(x)
                 embeddings.append(x)
 
@@ -68,11 +58,8 @@ class ArcModel(Model):
         x = self.lstm(embeddings)
 
         x = tf.reshape(x, [-1] + embeddings_shape[2:])
-        x = self.deconv1(x)
-        x = self.deconv2(x)
-        x = self.deconv3(x)
-        x = self.deconv4(x)
-        x = self.deconv5(x)
+        for conv_transpose in self.conv_transpose_layers:
+            x = conv_transpose(x)
         x = self.layernorm2(x)
         x = tf.squeeze(self.conv_final(x))
         return x
