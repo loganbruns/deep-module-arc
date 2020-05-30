@@ -6,7 +6,7 @@ import time
 
 import tensorflow as tf
 
-from arc import ArcDataset
+from arc import CompressedArcDataset
 from arc_model import ArcModel
 from data_transforms import random_roll_dataset, random_remap_dataset, random_flip_dataset, random_rotate_dataset
 
@@ -52,7 +52,7 @@ def main(unparsed_argv):
     test_summary_writer = tf.summary.create_file_writer(test_log_dir)        
 
     # Load NYUv2 depth dataset
-    train, val, _ = ArcDataset('data')
+    train, val, _ = CompressedArcDataset('data')
 
     train = random_roll_dataset(train.cache())
     train = random_remap_dataset(train)

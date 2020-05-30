@@ -42,6 +42,12 @@ $ cd data
 $ unzip /path/to/abstraction-and-reasoning-challenge.zip 
 ```
 
+#### Convert from JSON to TFRECORD
+
+```
+$ python json_to_tfrecord.py
+```
+
 ### Training steps
 
 #### Start tensorboard

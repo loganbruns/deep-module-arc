@@ -95,3 +95,42 @@ def ArcDataset(dir_name, pad_length=32, sequence_length=10):
     test = _create_arc_dataset(f'{dir_name}/test')
     
     return training, evaluation, test
+
+
+def CompressedArcDataset(dir_name):
+    """ Create a dataset to read ARC dataset """
+
+    def _parse_example(example):
+        feature = {
+            'id': tf.io.VarLenFeature(tf.string),
+            'train_examples': tf.io.VarLenFeature(tf.int64),
+            'train_examples_shape': tf.io.FixedLenFeature([5], tf.int64),
+            'train_length': tf.io.FixedLenFeature([1], tf.int64),
+            'test_input': tf.io.VarLenFeature(tf.int64),
+            'test_input_shape': tf.io.FixedLenFeature([4], tf.int64),
+            'test_output': tf.io.VarLenFeature(tf.int64),
+            'test_output_shape': tf.io.FixedLenFeature([4], tf.int64),
+        }
+        example = tf.io.parse_single_example(example, feature)
+        id = tf.sparse.to_dense(example['id'])[0]
+        train_examples = tf.reshape(tf.sparse.to_dense(example['train_examples']), example['train_examples_shape'])
+        train_examples = tf.cast(train_examples, tf.int32)
+        train_length = example['train_length']
+        test_input = tf.reshape(tf.sparse.to_dense(example['test_input']), example['test_input_shape'])
+        test_input = tf.cast(test_input, tf.int32)
+        test_output = tf.reshape(tf.sparse.to_dense(example['test_output']), example['test_output_shape'])
+        test_output = tf.cast(test_output, tf.int32)
+        return (id, train_length, train_examples, test_input, test_output)
+
+    def _create_arc_dataset(dir_name):
+        dataset = tf.data.Dataset.list_files(f'{dir_name}/*.tfrecord')
+        dataset = dataset.interleave(lambda filename: tf.data.TFRecordDataset(filename, compression_type='GZIP'))
+        dataset = dataset.map(_parse_example, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        return dataset
+
+    training = _create_arc_dataset(f'{dir_name}/training')
+    evaluation = _create_arc_dataset(f'{dir_name}/evaluation')
+    test = _create_arc_dataset(f'{dir_name}/test')
+    
+    return training, evaluation, test
+
