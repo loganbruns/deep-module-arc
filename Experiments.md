@@ -1,3 +1,10 @@
+# v1_6: Add learning rate schedule
+
+# v1_5: Switch to Adam-W optimizer and TF2.2
+
+- Switch to Adam-W optimizer and TF2.2
+- Not significant enough improvement
+
 # v1_4: Add random rotation data augmentation
 
 - Add random rotation to all images
