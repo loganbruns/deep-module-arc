@@ -51,7 +51,7 @@ def main(unparsed_argv):
     train_summary_writer = tf.summary.create_file_writer(train_log_dir)
     test_summary_writer = tf.summary.create_file_writer(test_log_dir)        
 
-    # Load NYUv2 depth dataset
+    # Load compressed ARC dataset
     train, val, _ = CompressedArcDataset('data')
 
     train = random_roll_dataset(train.cache())
