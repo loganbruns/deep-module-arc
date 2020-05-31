@@ -1,4 +1,17 @@
-# v1_6: Add learning rate schedule
+# v1_8: Try an even smaller model
+
+- conv_channels = [6, 12, 24, 48, 96] -> [3, 6, 12, 24, 48]
+- Improvment in test convergence compared to v1_4/v1_5
+
+# v1_7: Try a larger learning rate
+
+- Swiched from 1e-3 to 1e-2.
+- Doesn't seem like an improvement (reverted)
+
+# v1_6: Try a smaller model
+
+- conv_channels = [24, 48, 96, 192, 384] -> [6, 12, 24, 48, 96]
+- Improved test and training loss and other metrics
 
 # v1_5: Switch to Adam-W optimizer and TF2.2
 

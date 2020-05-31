@@ -13,10 +13,12 @@ class ArcModel(Model):
         super(ArcModel, self).__init__()
 
         # Layers
-        conv_channels = [24, 48, 96, 192, 384]
+        # conv_channels = [24, 48, 96, 192, 384]
+        # conv_channels = [6, 12, 24, 48, 96]
+        conv_channels = [3, 6, 12, 24, 48]
         self.conv_layers = [Conv2D(channel, 3, 2, padding='same', activation='relu') for channel in conv_channels]
         self.layernorm1 = LayerNormalization()
-        self.lstm = LSTM(384)
+        self.lstm = LSTM(conv_channels[-1])
         self.conv_transpose_layers = [Conv2DTranspose(channel, 3, 2, padding='same', activation='relu') for channel in reversed(conv_channels)]
         self.layernorm2 = LayerNormalization()
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
