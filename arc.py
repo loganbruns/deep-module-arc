@@ -134,3 +134,17 @@ def CompressedArcDataset(dir_name):
     
     return training, evaluation, test
 
+_colors = [(0, 0, 0), (0, 116, 217), (255, 65, 54), (46, 204, 64), (255, 220, 0), (170, 170, 170), (240, 18, 190), (255, 133, 27), (127, 219, 255), (135, 12, 37)]
+
+def color_arc_images(images):
+    _red_table = tf.lookup.StaticHashTable(tf.lookup.KeyValueTensorInitializer(tf.range(10), [r for r, g, b in _colors]), -1)
+    _green_table = tf.lookup.StaticHashTable(tf.lookup.KeyValueTensorInitializer(tf.range(10), [g for r, g, b in _colors]), -1)
+    _blue_table = tf.lookup.StaticHashTable(tf.lookup.KeyValueTensorInitializer(tf.range(10), [b for r, g, b in _colors]), -1)
+
+    images= tf.stack([
+        _red_table.lookup(images),
+        _green_table.lookup(images),
+        _blue_table.lookup(images)
+    ], axis=-1)
+
+    return tf.cast(images, tf.float32) / 255.

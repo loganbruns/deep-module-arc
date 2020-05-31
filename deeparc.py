@@ -6,7 +6,7 @@ import time
 
 import tensorflow as tf
 
-from arc import CompressedArcDataset
+from arc import CompressedArcDataset, color_arc_images
 from arc_model import ArcModel
 from data_transforms import random_roll_dataset, random_remap_dataset, random_flip_dataset, random_rotate_dataset
 
@@ -64,7 +64,7 @@ def main(unparsed_argv):
     val = random_rotate_dataset(val)
 
     train = train.repeat().shuffle(400).batch(FLAGS.batch_size).prefetch(4)
-    val = val.batch(FLAGS.batch_size).prefetch(1)
+    val = val.shuffle(100).batch(FLAGS.batch_size).prefetch(1)
 
     # Start training loop
     once_per_train = False
@@ -98,11 +98,24 @@ def main(unparsed_argv):
 
         if int(ckpt.step) % 500 == 0:
             with test_summary_writer.as_default():
+                once_per_test = False
                 for id, train_length, train_examples, test_input, test_output in val:
                     if test_output.shape[1] > 1:
                         print(f'WARNING: skipping multiple test predictions: {test_output.shape}')
                         continue
                     test_predictions = model.test_step(train_length, train_examples, test_input, test_output)
+                    if not once_per_test:
+                        train_images = color_arc_images(train_examples[0, :, :, :, :, 0])
+                        train_images = tf.concat([train_images[:,0,:,:,:], train_images[:,1,:,:,:]], axis=-2)
+                        tf.summary.image('training_images', train_images, step=int(ckpt.step))
+                        train_masks = tf.expand_dims(train_examples[0, :, :, :, :, 1], -1)
+                        train_masks = tf.image.grayscale_to_rgb(tf.cast(train_masks, tf.float32))
+                        train_masks = tf.concat([train_masks[:,0,:,:,:], train_masks[:,1,:,:,:]], axis=-2)
+                        tf.summary.image('training_masks', train_masks, step=int(ckpt.step))
+                        test_images = tf.concat([test_input[0,0,:,:,0], test_output[0,0,:,:,0], tf.argmax(test_predictions[0,:,:,:], -1, output_type=tf.int32)-1], axis=-2)
+                        test_images = color_arc_images(tf.expand_dims(test_images, 0))
+                        tf.summary.image('test_images', test_images, step=int(ckpt.step))
+                        once_per_test = True
 
                 print(f"{int(ckpt.step)}: test loss={model.test_loss.result()}, test accuracy={model.test_acc.result()}, test iou={model.test_iou.result()}")
                 tf.summary.scalar('loss', model.test_loss.result(), step=int(ckpt.step))
