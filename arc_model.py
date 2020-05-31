@@ -26,7 +26,7 @@ class ArcModel(Model):
         # Loss
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
         # self.optimizer = tf.keras.optimizers.Adam()
-        self.optimizer = tfa.optimizers.AdamW(weight_decay=1e-4)
+        self.optimizer = tfa.optimizers.AdamW(learning_rate=5e-3, weight_decay=1e-4)
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
         self.train_acc = tf.keras.metrics.SparseCategoricalAccuracy(name='train_acc')
         self.train_iou = tf.keras.metrics.MeanIoU(11, name='train_iou')

@@ -1,3 +1,13 @@
+# v1_10: Try a slightly larger learning rate
+
+- Switched from 1e-3 to 5e-3.
+- Improvement in learning speed and best test scores but training loss does not get as low
+
+# v1_9: Try a larger learning rate
+
+- Swiched from 1e-3 to 1e-1.
+- Model failed to learn anything
+
 # v1_8: Try an even smaller model
 
 - conv_channels = [6, 12, 24, 48, 96] -> [3, 6, 12, 24, 48]
