@@ -1,3 +1,20 @@
+# v1_14: Double layers
+
+- conv_channels = [3, 6, 12, 24, 48]
+
+# v1_13: Medium size model
+
+- conv_channels = [6, 12, 24, 48, 96]
+- test keeps improving but progress is very slow and not quite as good v1_8
+
+# v1_12: Tiny size model
+
+- conv_channels = [1, 2, 4, 8, 16]
+
+# v1_11: Medium size model with new learning rate
+
+- Basically the same as last medium model
+
 # v1_10: Try a slightly larger learning rate
 
 - Switched from 1e-3 to 5e-3.

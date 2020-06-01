@@ -16,12 +16,21 @@ class ArcModel(Model):
         # conv_channels = [24, 48, 96, 192, 384]
         # conv_channels = [6, 12, 24, 48, 96]
         conv_channels = [3, 6, 12, 24, 48]
-        self.conv_layers = [Conv2D(channel, 3, 2, padding='same', activation='relu') for channel in conv_channels]
+        # conv_channels = [1, 2, 4, 8, 16]
+        self.conv_layers = []
         self.layernorm1 = LayerNormalization()
         self.lstm = LSTM(conv_channels[-1])
-        self.conv_transpose_layers = [Conv2DTranspose(channel, 3, 2, padding='same', activation='relu') for channel in reversed(conv_channels)]
+        self.conv_transpose_layers = []
         self.layernorm2 = LayerNormalization()
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
+
+        for channel in conv_channels:
+            self.conv_layers.append(Conv2D(channel, 3, 1, padding='same', activation='relu'))
+            self.conv_layers.append(Conv2D(channel, 3, 2, padding='same', activation='relu'))
+
+        for channel in reversed(conv_channels):
+            self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 1, padding='same', activation='relu'))
+            self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 2, padding='same', activation='relu'))
 
         # Loss
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
