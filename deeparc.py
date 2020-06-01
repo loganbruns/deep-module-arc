@@ -89,6 +89,18 @@ def main(unparsed_argv):
             tf.summary.scalar('accuracy', model.train_acc.result(), step=int(ckpt.step))
             tf.summary.scalar('iou', model.train_iou.result(), step=int(ckpt.step))
 
+            if int(ckpt.step) % 500 == 0:
+                train_images = color_arc_images(train_examples[0, :, :, :, :, 0])
+                train_images = tf.concat([train_images[:,0,:,:,:], train_images[:,1,:,:,:]], axis=-2)
+                tf.summary.image('training_images', train_images, step=int(ckpt.step))
+                train_masks = tf.expand_dims(train_examples[0, :, :, :, :, 1], -1)
+                train_masks = tf.image.grayscale_to_rgb(tf.cast(train_masks, tf.float32))
+                train_masks = tf.concat([train_masks[:,0,:,:,:], train_masks[:,1,:,:,:]], axis=-2)
+                tf.summary.image('training_masks', train_masks, step=int(ckpt.step))
+                test_images = tf.concat([test_input[0,0,:,:,0], test_output[0,0,:,:,0], tf.argmax(predictions[0,:,:,:], -1, output_type=tf.int32)-1], axis=-1)
+                test_images = color_arc_images(tf.expand_dims(test_images, 0))
+                tf.summary.image('test_images', test_images, step=int(ckpt.step))
+                
             train_summary_writer.flush()
                 
         if int(ckpt.step) % 100 == 0:
@@ -103,7 +115,7 @@ def main(unparsed_argv):
                     if test_output.shape[1] > 1:
                         print(f'WARNING: skipping multiple test predictions: {test_output.shape}')
                         continue
-                    test_predictions = model.test_step(train_length, train_examples, test_input, test_output)
+                    predictions = model.test_step(train_length, train_examples, test_input, test_output)
                     if not once_per_test:
                         train_images = color_arc_images(train_examples[0, :, :, :, :, 0])
                         train_images = tf.concat([train_images[:,0,:,:,:], train_images[:,1,:,:,:]], axis=-2)
@@ -112,7 +124,7 @@ def main(unparsed_argv):
                         train_masks = tf.image.grayscale_to_rgb(tf.cast(train_masks, tf.float32))
                         train_masks = tf.concat([train_masks[:,0,:,:,:], train_masks[:,1,:,:,:]], axis=-2)
                         tf.summary.image('training_masks', train_masks, step=int(ckpt.step))
-                        test_images = tf.concat([test_input[0,0,:,:,0], test_output[0,0,:,:,0], tf.argmax(test_predictions[0,:,:,:], -1, output_type=tf.int32)-1], axis=-2)
+                        test_images = tf.concat([test_input[0,0,:,:,0], test_output[0,0,:,:,0], tf.argmax(predictions[0,:,:,:], -1, output_type=tf.int32)-1], axis=-1)
                         test_images = color_arc_images(tf.expand_dims(test_images, 0))
                         tf.summary.image('test_images', test_images, step=int(ckpt.step))
                         once_per_test = True
