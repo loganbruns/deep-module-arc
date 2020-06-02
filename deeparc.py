@@ -144,6 +144,8 @@ def main(unparsed_argv):
             starttime = time.time()
             startstep = int(ckpt.step)
 
+            model.reset_metrics()
+            
             #tf.saved_model.save(model, f'{experiment_dir}/tf_model/{int(ckpt.step)}/')
 
 if __name__ == '__main__':
