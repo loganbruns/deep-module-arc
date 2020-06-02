@@ -45,6 +45,7 @@ class ArcModel(Model):
         self.test_loss = tf.keras.metrics.Mean(name='test_loss')
         self.test_acc = tf.keras.metrics.SparseCategoricalAccuracy(name='test_acc')
         self.test_iou = tf.keras.metrics.MeanIoU(11, name='test_iou')
+        self.best_test_loss = tf.Variable(100., trainable=False)
 
     @tf.function
     def call(self, train_length, train_examples, test_input):
@@ -111,3 +112,10 @@ class ArcModel(Model):
         self.test_loss.reset_states()
         self.test_acc.reset_states()
         self.test_iou.reset_states()
+
+    def is_best_loss(self, test_loss):
+        if test_loss < self.best_test_loss:
+            self.best_test_loss = test_loss
+            return True
+        else:
+            return False

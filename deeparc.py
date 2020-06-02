@@ -39,6 +39,7 @@ def main(unparsed_argv):
     model = ArcModel()
     ckpt = tf.train.Checkpoint(step=tf.Variable(1), optimizer=model.optimizer, net=model)
     manager = tf.train.CheckpointManager(ckpt, f'{experiment_dir}/tf_ckpts', max_to_keep=3)
+    best_manager = tf.train.CheckpointManager(ckpt, f'{experiment_dir}/best_tf_ckpts', max_to_keep=3)
     ckpt.restore(manager.latest_checkpoint)
     if manager.latest_checkpoint:
         print("Restored from {}".format(manager.latest_checkpoint))
@@ -135,6 +136,10 @@ def main(unparsed_argv):
                 tf.summary.scalar('iou', model.test_iou.result(), step=int(ckpt.step))
 
                 test_summary_writer.flush()
+
+                if model.is_best_loss(model.test_loss.result()):
+                    save_path = best_manager.save()
+                    print("Saved new best checkpoint for step {}: {}".format(int(ckpt.step), save_path))
                 
             template = 'Step {}, Loss: {}, Test Loss: {}, Sec/Iters: {}'
             print (template.format(int(ckpt.step),
