@@ -1,3 +1,7 @@
+# v1_18: Medium size model with skip to final output
+
+- conv_channels = [6, 12, 24, 48, 96]
+
 # v1_17: Double layers with concat skip connections
 
 - Double layers with concat skip connections
