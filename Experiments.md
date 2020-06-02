@@ -1,6 +1,11 @@
+# v1_15: Double layers with gated skip connections
+
+- Double layers with LSTM like gated skip connections
+
 # v1_14: Double layers
 
 - conv_channels = [3, 6, 12, 24, 48]
+- trains too slow
 
 # v1_13: Medium size model
 

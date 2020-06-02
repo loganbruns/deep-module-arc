@@ -4,11 +4,50 @@
 import tensorflow as tf
 import tensorflow_addons as tfa
 
-from tensorflow.keras.layers import Conv2D, Conv2DTranspose, LayerNormalization, LSTM
+from tensorflow.keras.layers import Conv2D, Conv2DTranspose, Layer, LayerNormalization, LSTM
 from tensorflow import keras
 from tensorflow.keras import Model
 
+class ResConvBlock(Layer):
+    def __init__(self, channels, filters):
+        super(ResConvBlock, self).__init__()
+        self.channels = channels
+        self.filters = filters
+
+    def build(self, input_shape):
+        self.conv_1 = Conv2D(input_shape[-1], self.filters, 1, padding='same', activation='relu')
+        self.conv_1.build(input_shape)
+        self.gate = tf.Variable(initial_value=0.975, trainable=True)
+        self.conv_2 = Conv2D(self.channels, self.filters, 2, padding='same', activation='relu')
+        self.conv_2.build(input_shape)
+
+    def call(self, inputs):
+        x = self.conv_1(inputs)
+        x = self.gate * inputs + (1. - self.gate) * x
+        x = self.conv_2(x)
+        return x
+
+class ResConvTransposeBlock(Layer):
+    def __init__(self, channels, filters):
+        super(ResConvTransposeBlock, self).__init__()
+        self.channels = channels
+        self.filters = filters
+
+    def build(self, input_shape):
+        self.conv_1 = Conv2DTranspose(input_shape[-1], self.filters, 1, padding='same', activation='relu')
+        self.conv_1.build(input_shape)
+        self.gate = tf.Variable(initial_value=0.975, trainable=True)
+        self.conv_2 = Conv2DTranspose(self.channels, self.filters, 2, padding='same', activation='relu')
+        self.conv_2.build(input_shape)
+
+    def call(self, inputs):
+        x = self.conv_1(inputs)
+        x = self.gate * inputs + (1. - self.gate) * x
+        x = self.conv_2(x)
+        return x
+
 class ArcModel(Model):
+
     def __init__(self):
         super(ArcModel, self).__init__()
 
@@ -25,12 +64,14 @@ class ArcModel(Model):
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
 
         for channel in conv_channels:
-            self.conv_layers.append(Conv2D(channel, 3, 1, padding='same', activation='relu'))
-            self.conv_layers.append(Conv2D(channel, 3, 2, padding='same', activation='relu'))
+            self.conv_layers.append(ResConvBlock(channel, 3))
+            # self.conv_layers.append(Conv2D(channel, 3, 1, padding='same', activation='relu'))
+            # self.conv_layers.append(Conv2D(channel, 3, 2, padding='same', activation='relu'))
 
         for channel in reversed(conv_channels):
-            self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 1, padding='same', activation='relu'))
-            self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 2, padding='same', activation='relu'))
+            self.conv_transpose_layers.append(ResConvTransposeBlock(channel, 3))
+            # self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 1, padding='same', activation='relu'))
+            # self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 2, padding='same', activation='relu'))
 
         # Loss
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
