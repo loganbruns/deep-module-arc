@@ -1,7 +1,7 @@
-EXPERIMENT=v1_16
+EXPERIMENT=v1_17
 
 train:
-	python deeparc.py --experiment_name=$(EXPERIMENT) --gpu=1
+	python deeparc.py --experiment_name=$(EXPERIMENT) --gpu=0
 
 notebook:
 	nohup jupyter notebook --no-browser --ip=0.0.0.0 &

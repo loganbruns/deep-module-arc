@@ -1,3 +1,8 @@
+# v1_17: Double layers with concat skip connections
+
+- Double layers with concat skip connections
+- Still does not seem to get rid of the flattening of the learning at the end
+
 # v1_16: Skip test input to final output layer to encourage copying
 
 - Skip test input to final output layer to encourage copying
