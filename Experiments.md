@@ -1,3 +1,9 @@
+# v1_16: Skip test input to final output layer to encourage copying
+
+- Skip test input to final output layer to encourage copying
+- Remove double layers for now
+- Greatly improves test and train metrics
+
 # v1_15: Double layers with gated skip connections
 
 - Double layers with LSTM like gated skip connections
