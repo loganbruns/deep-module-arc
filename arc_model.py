@@ -17,8 +17,8 @@ class ArcModel(Model):
 
         # Layers
         # conv_channels = [24, 48, 96, 192, 384]
-        conv_channels = [6, 12, 24, 48, 96]
-        # conv_channels = [3, 6, 12, 24, 48]
+        # conv_channels = [6, 12, 24, 48, 96]
+        conv_channels = [3, 6, 12, 24, 48]
         # conv_channels = [1, 2, 4, 8, 16]
         self.conv_layers = []
         self.layernorm1 = LayerNormalization()
