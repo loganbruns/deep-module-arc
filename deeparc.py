@@ -20,7 +20,8 @@ flags.DEFINE_string('experiment_name', None, 'Name of experiment to train and ru
 
 flags.DEFINE_string('gpu', '0', 'GPU to use')
 
-flags.DEFINE_integer('batch_size', 32, 'Batch size')
+#flags.DEFINE_integer('batch_size', 32, 'Batch size')
+flags.DEFINE_integer('batch_size', 75, 'Batch size')
 
 def main(unparsed_argv):
     """start main training loop"""

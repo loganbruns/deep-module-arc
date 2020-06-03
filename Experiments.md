@@ -1,3 +1,18 @@
+# v1_21: Try LAMB optimizer with large batch
+
+- Try LAMB optimizer with large batch
+- Much improved performance, converges much faster (~10-20k versus >100k)
+
+# v1_20: Small size model with skip to final output
+
+- conv_channels = [3, 6, 12, 24, 48]
+- goes up and down. not stable
+
+# v1_19: Tiny size model with skip to final output
+
+- conv_channels = [1, 2, 4, 8, 16]
+- got stuck early in training
+
 # v1_18: Medium size model with skip to final output
 
 - conv_channels = [6, 12, 24, 48, 96]
