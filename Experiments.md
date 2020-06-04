@@ -1,6 +1,11 @@
+# v1_24: Use four convolutional features
+
+- Use four convolutional features
+
 # v1_23: Use two convolutional features
 
 - Use two convolutional features
+- Still degrades around 700k
 
 # v1_22: LAMB with double layers with concat skip connections
 
