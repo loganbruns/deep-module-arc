@@ -1,3 +1,7 @@
+# v1_23: Use two convolutional features
+
+- Use two convolutional features
+
 # v1_22: LAMB with double layers with concat skip connections
 
 - Double layers with concat skip connections

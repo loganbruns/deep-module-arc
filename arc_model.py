@@ -8,7 +8,7 @@ from tensorflow.keras.layers import Conv2D, Conv2DTranspose, LayerNormalization,
 from tensorflow import keras
 from tensorflow.keras import Model
 
-from layer_utils import ResConvBlock, ResConvTransposeBlock
+# from layer_utils import ResConvBlock, ResConvTransposeBlock
 
 class ArcModel(Model):
 
@@ -27,13 +27,17 @@ class ArcModel(Model):
         self.layernorm2 = LayerNormalization()
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
 
-        for channel in conv_channels:
-            # self.conv_layers.append(Conv2D(channel, 3, 2, padding='same', activation='relu'))
-            self.conv_layers.append(ResConvBlock(channel, 3))
+        conv_features = 2
+        for i in range(conv_features):
+            feature = []
+            for channel in conv_channels:
+                feature.append(Conv2D(channel, 3, 2, padding='same', activation='relu'))
+                # self.conv_layers.append(ResConvBlock(channel, 3))
+            self.conv_layers.append(feature)
 
         for channel in reversed(conv_channels):
-            # self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 2, padding='same', activation='relu'))
-            self.conv_transpose_layers.append(ResConvTransposeBlock(channel, 3))
+            self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 2, padding='same', activation='relu'))
+            # self.conv_transpose_layers.append(ResConvTransposeBlock(channel, 3))
 
         # Loss
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
@@ -62,20 +66,30 @@ class ArcModel(Model):
         embeddings = []
         for images in [train_examples, test_input]:
             for i in range(images.shape[1]):
-                x = images[:,i,:,:,:]
+                features = []
+                for feature in self.conv_layers:
+                    x = images[:,i,:,:,:]
 
-                for conv in self.conv_layers:
-                    x = conv(x)
+                    for conv in feature:
+                        x = conv(x)
+                    feature_shape = list(x.shape)
+                    features.append(x)
+
+                print(f'DEBUG: features[0].shape={features[0].shape}')
+                x = tf.concat(features, axis=-1)
+                print(f'DEBUG: x.shape={x.shape}')
                 x = self.layernorm1(x)
                 embeddings.append(x)
 
         embeddings = tf.stack(embeddings, axis=1)
+        print(f'DEBUG: embeddings.shape={embeddings.shape}')
         embeddings_shape = list(embeddings.shape)
         embeddings = tf.reshape(embeddings, embeddings_shape[:2] + [-1])
 
         x = self.lstm(embeddings)
+        print(f'DEBUG: x.shape={x.shape}')
 
-        x = tf.reshape(x, [-1] + embeddings_shape[2:])
+        x = tf.reshape(x, [-1] + feature_shape[1:])
         for conv_transpose in self.conv_transpose_layers:
             x = conv_transpose(x)
         x = self.layernorm2(x)
