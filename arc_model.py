@@ -8,7 +8,7 @@ from tensorflow.keras.layers import Conv2D, Conv2DTranspose, LayerNormalization,
 from tensorflow import keras
 from tensorflow.keras import Model
 
-# from layer_utils import ResConvBlock, ResConvTransposeBlock
+from layer_utils import ResConvBlock, ResConvTransposeBlock
 
 class ArcModel(Model):
 
@@ -28,12 +28,12 @@ class ArcModel(Model):
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
 
         for channel in conv_channels:
-            self.conv_layers.append(Conv2D(channel, 3, 2, padding='same', activation='relu'))
-            # self.conv_layers.append(ResConvBlock(channel, 3))
+            # self.conv_layers.append(Conv2D(channel, 3, 2, padding='same', activation='relu'))
+            self.conv_layers.append(ResConvBlock(channel, 3))
 
         for channel in reversed(conv_channels):
-            self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 2, padding='same', activation='relu'))
-            # self.conv_transpose_layers.append(ResConvTransposeBlock(channel, 3))
+            # self.conv_transpose_layers.append(Conv2DTranspose(channel, 3, 2, padding='same', activation='relu'))
+            self.conv_transpose_layers.append(ResConvTransposeBlock(channel, 3))
 
         # Loss
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()

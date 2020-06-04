@@ -1,3 +1,8 @@
+# v1_22: LAMB with double layers with concat skip connections
+
+- Double layers with concat skip connections
+- Converges faster but does not improve results
+
 # v1_21: Try LAMB optimizer with large batch
 
 - Try LAMB optimizer with large batch
