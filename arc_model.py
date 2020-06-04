@@ -27,7 +27,7 @@ class ArcModel(Model):
         self.layernorm2 = LayerNormalization()
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
 
-        conv_features = 4
+        conv_features = 8
         for i in range(conv_features):
             feature = []
             for channel in conv_channels:

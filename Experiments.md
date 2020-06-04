@@ -1,6 +1,11 @@
+# v1_25: Use eight convolutional features
+
+- Use eight convolutional features
+
 # v1_24: Use four convolutional features
 
 - Use four convolutional features
+- Looked better but then degraded at 600k
 
 # v1_23: Use two convolutional features
 
