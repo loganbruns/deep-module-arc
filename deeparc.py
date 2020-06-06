@@ -37,8 +37,9 @@ def main(unparsed_argv):
         os.mkdir(experiment_dir)
 
     # Load model
-    model = ArcModel()
-    ckpt = tf.train.Checkpoint(step=tf.Variable(1), optimizer=model.optimizer, net=model)
+    step = tf.Variable(1)
+    model = ArcModel(step)
+    ckpt = tf.train.Checkpoint(step=step, optimizer=model.optimizer, net=model)
     manager = tf.train.CheckpointManager(ckpt, f'{experiment_dir}/tf_ckpts', max_to_keep=3)
     best_manager = tf.train.CheckpointManager(ckpt, f'{experiment_dir}/best_tf_ckpts', max_to_keep=3)
     ckpt.restore(manager.latest_checkpoint)

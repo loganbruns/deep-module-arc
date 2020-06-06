@@ -1,3 +1,8 @@
+# v1_27: Use two convolutional features with piecewise learning rate
+
+- Use two convolutional features with piecewise learning rate
+- No difference yet
+
 # v1_26: Use four convolutional features with addl layer norm
 
 - Use four convolutional features with addl layer norm

@@ -12,7 +12,7 @@ from tensorflow.keras import Model
 
 class ArcModel(Model):
 
-    def __init__(self):
+    def __init__(self, step):
         super(ArcModel, self).__init__()
 
         # Layers
@@ -28,7 +28,7 @@ class ArcModel(Model):
         self.layernorm3 = LayerNormalization()
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
 
-        conv_features = 4
+        conv_features = 2
         for i in range(conv_features):
             feature = []
             for channel in conv_channels:
@@ -44,7 +44,11 @@ class ArcModel(Model):
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
         # self.optimizer = tf.keras.optimizers.Adam()
         # self.optimizer = tfa.optimizers.AdamW(learning_rate=5e-3, weight_decay=1e-4)
-        self.optimizer = tfa.optimizers.LAMB()
+        schedule = tf.optimizers.schedules.PiecewiseConstantDecay(
+            [60000, 300000],
+            [1e-0, 1e-1, 1e-2]
+        )
+        self.optimizer = tfa.optimizers.LAMB(.001 * schedule(step))
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
         self.train_acc = tf.keras.metrics.SparseCategoricalAccuracy(name='train_acc')
         self.train_iou = tf.keras.metrics.MeanIoU(11, name='train_iou')
