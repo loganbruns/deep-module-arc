@@ -22,7 +22,7 @@ class ArcModel(Model):
         # conv_channels = [1, 2, 4, 8, 16]
         self.conv_layers = []
         self.layernorm1 = LayerNormalization()
-        self.lstm = LSTM(conv_channels[-1])
+        self.lstm = LSTM(2 * conv_channels[-1])
         self.layernorm2 = LayerNormalization()
         self.conv_transpose_layers = []
         self.layernorm3 = LayerNormalization()
@@ -45,7 +45,7 @@ class ArcModel(Model):
         # self.optimizer = tf.keras.optimizers.Adam()
         # self.optimizer = tfa.optimizers.AdamW(learning_rate=5e-3, weight_decay=1e-4)
         schedule = tf.optimizers.schedules.PiecewiseConstantDecay(
-            [60000, 300000],
+            [55000, 300000],
             [1e-0, 1e-1, 1e-2]
         )
         self.optimizer = tfa.optimizers.LAMB(.001 * schedule(step))
@@ -69,6 +69,9 @@ class ArcModel(Model):
         train_examples = tf.one_hot(train_examples, 11)
 
         embeddings = []
+        mask = tf.squeeze(tf.sequence_mask(train_length, 10))
+        mask = tf.concat([mask, tf.ones((mask.shape[0], 1), dtype=tf.bool)], -1)
+
         for images in [train_examples, test_input]:
             for i in range(images.shape[1]):
                 features = []
@@ -84,13 +87,15 @@ class ArcModel(Model):
                 x = self.layernorm1(x)
                 embeddings.append(x)
 
+        embeddings.append(tf.zeros(embeddings[-1].shape))
+
         embeddings = tf.stack(embeddings, axis=1)
         embeddings_shape = list(embeddings.shape)
-        embeddings = tf.reshape(embeddings, embeddings_shape[:2] + [-1])
+        embeddings = tf.reshape(embeddings, embeddings_shape[:1] + [int(embeddings_shape[1] / 2), -1])
 
-        x = self.lstm(embeddings)
+        x = self.lstm(inputs=embeddings, mask=tf.cast(mask, tf.bool))
 
-        x = tf.reshape(x, [-1] + feature_shape[1:])
+        x = tf.reshape(x, [-1] + feature_shape[1:3] + [2 * feature_shape[3]])
         x = self.layernorm2(x)
         for conv_transpose in self.conv_transpose_layers:
             x = conv_transpose(x)

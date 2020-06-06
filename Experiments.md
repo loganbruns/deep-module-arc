@@ -1,7 +1,16 @@
+# v1_29: Use eight convolutional features
+
+- Use eight convolutional features
+
+# v1_28: Split input and output images in LSTM sequence and mask unused
+
+- Split input and output images in LSTM sequence and mask unused
+- Better metrics but only a bit. Maybe try more than 2 features
+
 # v1_27: Use two convolutional features with piecewise learning rate
 
 - Use two convolutional features with piecewise learning rate
-- No difference yet
+- Better metrics but only a bit.
 
 # v1_26: Use four convolutional features with addl layer norm
 
