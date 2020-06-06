@@ -5,7 +5,7 @@
 # v1_28: Split input and output images in LSTM sequence and mask unused
 
 - Split input and output images in LSTM sequence and mask unused
-- Better metrics but only a bit. Maybe try more than 2 features
+- Better metrics towards end of run but not night and day. Maybe try more than 2 features
 
 # v1_27: Use two convolutional features with piecewise learning rate
 

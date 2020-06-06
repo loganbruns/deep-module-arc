@@ -16,20 +16,20 @@ class ArcModel(Model):
         super(ArcModel, self).__init__()
 
         # Layers
+        self.conv_features = 8
         # conv_channels = [24, 48, 96, 192, 384]
         # conv_channels = [6, 12, 24, 48, 96]
         conv_channels = [3, 6, 12, 24, 48]
         # conv_channels = [1, 2, 4, 8, 16]
         self.conv_layers = []
         self.layernorm1 = LayerNormalization()
-        self.lstm = LSTM(2 * conv_channels[-1])
+        self.lstm = LSTM(self.conv_features * conv_channels[-1])
         self.layernorm2 = LayerNormalization()
         self.conv_transpose_layers = []
         self.layernorm3 = LayerNormalization()
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
 
-        conv_features = 2
-        for i in range(conv_features):
+        for i in range(self.conv_features):
             feature = []
             for channel in conv_channels:
                 feature.append(Conv2D(channel, 3, 2, padding='same', activation='relu'))
@@ -91,11 +91,11 @@ class ArcModel(Model):
 
         embeddings = tf.stack(embeddings, axis=1)
         embeddings_shape = list(embeddings.shape)
-        embeddings = tf.reshape(embeddings, embeddings_shape[:1] + [int(embeddings_shape[1] / 2), -1])
+        embeddings = tf.reshape(embeddings, embeddings_shape[:1] + [int(embeddings_shape[1] / self.conv_features), -1])
 
         x = self.lstm(inputs=embeddings, mask=tf.cast(mask, tf.bool))
 
-        x = tf.reshape(x, [-1] + feature_shape[1:3] + [2 * feature_shape[3]])
+        x = tf.reshape(x, [-1] + feature_shape[1:3] + [self.conv_features * feature_shape[3]])
         x = self.layernorm2(x)
         for conv_transpose in self.conv_transpose_layers:
             x = conv_transpose(x)
