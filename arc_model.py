@@ -23,11 +23,12 @@ class ArcModel(Model):
         self.conv_layers = []
         self.layernorm1 = LayerNormalization()
         self.lstm = LSTM(conv_channels[-1])
-        self.conv_transpose_layers = []
         self.layernorm2 = LayerNormalization()
+        self.conv_transpose_layers = []
+        self.layernorm3 = LayerNormalization()
         self.conv_final = Conv2D(11, 3, padding='same', activation='softmax')
 
-        conv_features = 8
+        conv_features = 4
         for i in range(conv_features):
             feature = []
             for channel in conv_channels:
@@ -75,24 +76,21 @@ class ArcModel(Model):
                     feature_shape = list(x.shape)
                     features.append(x)
 
-                print(f'DEBUG: features[0].shape={features[0].shape}')
                 x = tf.concat(features, axis=-1)
-                print(f'DEBUG: x.shape={x.shape}')
                 x = self.layernorm1(x)
                 embeddings.append(x)
 
         embeddings = tf.stack(embeddings, axis=1)
-        print(f'DEBUG: embeddings.shape={embeddings.shape}')
         embeddings_shape = list(embeddings.shape)
         embeddings = tf.reshape(embeddings, embeddings_shape[:2] + [-1])
 
         x = self.lstm(embeddings)
-        print(f'DEBUG: x.shape={x.shape}')
 
         x = tf.reshape(x, [-1] + feature_shape[1:])
+        x = self.layernorm2(x)
         for conv_transpose in self.conv_transpose_layers:
             x = conv_transpose(x)
-        x = self.layernorm2(x)
+        x = self.layernorm3(x)
         x = tf.concat([x, tf.squeeze(test_input)], -1)
         x = tf.squeeze(self.conv_final(x))
         return x

@@ -1,6 +1,13 @@
+# v1_26: Use four convolutional features with addl layer norm
+
+- Use four convolutional features with addl layer norm
+- Still diverged at around 600k
+
 # v1_25: Use eight convolutional features
 
 - Use eight convolutional features
+- Lower training loss
+- Still diverged at around 600k
 
 # v1_24: Use four convolutional features
 
