@@ -16,7 +16,7 @@ class ArcModel(Model):
         super(ArcModel, self).__init__()
 
         # Layers
-        self.conv_features = 8
+        self.conv_features = 2
         # conv_channels = [24, 48, 96, 192, 384]
         # conv_channels = [6, 12, 24, 48, 96]
         conv_channels = [3, 6, 12, 24, 48]
@@ -45,8 +45,8 @@ class ArcModel(Model):
         # self.optimizer = tf.keras.optimizers.Adam()
         # self.optimizer = tfa.optimizers.AdamW(learning_rate=5e-3, weight_decay=1e-4)
         schedule = tf.optimizers.schedules.PiecewiseConstantDecay(
-            [55000, 300000],
-            [1e-0, 1e-1, 1e-2]
+            [50000, 150000, 250000, 350000],
+            [1e-0, 1e-1, 1e-2, 1e-3, 1e-4]
         )
         self.optimizer = tfa.optimizers.LAMB(.001 * schedule(step))
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')

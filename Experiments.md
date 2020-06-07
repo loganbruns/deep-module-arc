@@ -1,3 +1,8 @@
+# v1_30: Try two convolutional features with more aggressive learning rate decay
+
+- two convolutional features with more aggressive learning rate decay
+- not much difference- might be worth trying adam again
+
 # v1_29: Use eight convolutional features
 
 - Use eight convolutional features
@@ -5,7 +10,8 @@
 # v1_28: Split input and output images in LSTM sequence and mask unused
 
 - Split input and output images in LSTM sequence and mask unused
-- Better metrics towards end of run but not night and day. Maybe try more than 2 features
+- Best metrics far towards end of run but not night and day. Maybe try more than 2 features
+- Diverged later at 650k
 
 # v1_27: Use two convolutional features with piecewise learning rate
 
