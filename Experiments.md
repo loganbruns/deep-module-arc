@@ -1,3 +1,7 @@
+# v1_31: Retry Adam-W with piecewise learning rate schedule and 2 conv features
+
+- v1_31: Retry Adam-W with piecewise learning rate schedule and 2 conv features
+
 # v1_30: Try two convolutional features with more aggressive learning rate decay
 
 - two convolutional features with more aggressive learning rate decay
@@ -6,6 +10,7 @@
 # v1_29: Use eight convolutional features
 
 - Use eight convolutional features
+- Best so far on qualitative examination and some metrics
 
 # v1_28: Split input and output images in LSTM sequence and mask unused
 
