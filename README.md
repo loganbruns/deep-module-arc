@@ -2,8 +2,19 @@
 Contact: Logan Bruns <logan@gedanken.org>
 
 ### Abstract from project paper
+The Abstraction and Reasoning Corpus (ARC) attempts to provide a
+benchmark on abstract reasoning given a limited number of visual
+priors. We train a deep learning model to run against this benchmark
+and show that it is capable of recognizing certain types of tasks
+from a few examples and then perform these tasks at least to some
+extent. The best test accuracy was .94 and then IoU was .56 but the
+qualitative analysis of the predictions is perhaps more
+interesting. Observations are made about which portions of the data
+preprocessing and architecture are important and why.
 
 ### Example predictions on test dataset
+
+<img src="images/test_predictions.png" alt="Loss" width="640">
 
 ### Repository layout
 
@@ -11,9 +22,21 @@ Contact: Logan Bruns <logan@gedanken.org>
 
 _Makefile_: top level makefile to run training, start tensorboard and start notebook server
 
-_deep\_module\_arc.ipynb_: top level notebook
+_deeparc.py_: training script
+
+_arc\_model.py_: model class containing model architecture and losses
+
+_layer\_utils.py_: utilities for creating model layers
+
+_data\_transforms.py_: dataset transforms for creating features and augmenting data
+
+_arc.py_: ARC dataset loader
+
+_json\_to\_tfrecord.py_: script to convert dataset to tfrecord format
 
 _environment.yml_: conda environment yaml for creating python virtual environment
+
+_Experiments.md_: brief experiments logs
 
 #### Directories
 
